@@ -4,7 +4,8 @@ import co.edu.unicordoba.registrovisitantes.modelo.Visitante;
 import co.edu.unicordoba.registrovisitantes.servicio.VisitanteService;
 import co.edu.unicordoba.registrovisitantes.util.TextoUtil;
 import org.springframework.web.bind.annotation.*;
-
+import java.net.InetAddress;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class VisitanteController {
 
     private final VisitanteService servicio;
-
+private static final Instant ARRANQUE = Instant.now();
    
     public VisitanteController(VisitanteService servicio) {
         this.servicio = servicio;
@@ -31,7 +32,15 @@ public class VisitanteController {
     public List<Visitante> listar() {
         return servicio.listar();
     }
-
+@GetMapping("/instancia")
+public Map<String, Object> instancia() throws Exception {
+    Map<String, Object> r = new LinkedHashMap<>();
+    r.put("host", InetAddress.getLocalHost().getHostName());
+    r.put("arranqueJvm", ARRANQUE.toString());
+    r.put("creados", Visitante.getTotalCreados());
+    r.put("registrados", servicio.contarRegistrados());
+    return r;
+}
     @GetMapping("/conteos")
     public Map<String, Object> conteos() {
         Map<String, Object> respuesta = new LinkedHashMap<>();
